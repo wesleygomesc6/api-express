@@ -1,0 +1,24 @@
+{
+  "name": "api-express",
+  "version": "1.0.0",
+  "description": "API didática para aulas de desenvolvimento web. Roda com **Node.js puro**, sem\r instalar nada.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wesleygomesc6/api-express.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/wesleygomesc6/api-express/issues"
+  },
+  "homepage": "https://github.com/wesleygomesc6/api-express#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
