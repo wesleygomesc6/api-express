@@ -1,93 +1,55 @@
-# 📦 API CRUD de Usuários — Node.js (sem dependências)
+# API CRUD de Alunos e Professores
 
-API didática para aulas de desenvolvimento web. Roda com **Node.js puro**, sem
-instalar nada.
+API didática em Node.js, Express e MySQL, sem ORM. Os dados são persistidos no
+banco local.
 
 ---
 
 ## ▶️ Como rodar
 
+Instale as dependências:
+
 ```bash
-node index.js
+npm install
 ```
 
-Servidor inicia em `http://localhost:3000`
+Crie um banco MySQL e as tabelas executando o arquivo `schema.sql`. Depois,
+copie `.env.example` para `.env` e ajuste usuário, senha e nome do banco.
+
+Inicie a API:
+
+```bash
+npm run dev
+```
+
+O servidor inicia em `http://localhost:3000` somente depois de validar a
+conexão com o MySQL.
 
 ---
 
-## 🗂️ Rotas
+## Rotas
 
 | Método   | URL           | Ação                     |
 |----------|---------------|--------------------------|
-| GET      | /users        | Lista todos os usuários  |
-| GET      | /users/:id    | Busca um usuário por ID  |
-| POST     | /users        | Cria um novo usuário     |
-| PUT      | /users/:id    | Atualiza (substitui)     |
-| PATCH    | /users/:id    | Atualiza parcialmente    |
-| DELETE   | /users/:id    | Remove um usuário        |
+| GET      | /alunos       | Lista todos os alunos    |
+| POST     | /alunos       | Cria um aluno            |
+| PUT      | /alunos/:id   | Atualiza um aluno        |
+| DELETE   | /alunos/:id   | Remove um aluno          |
+| GET      | /professores  | Lista todos os professores |
+| POST     | /professores  | Cria um professor        |
+| PUT      | /professores/:id | Atualiza um professor |
+| DELETE   | /professores/:id | Remove um professor  |
 
 ---
 
-## 📋 Exemplos com `curl`
-
-### Listar todos
+### Criar aluno
 ```bash
-curl http://localhost:3000/users
-```
-
-### Buscar por ID
-```bash
-curl http://localhost:3000/users/1
-```
-
-### Criar usuário
-```bash
-curl -X POST http://localhost:3000/users \
+curl -X POST http://localhost:3000/alunos \
   -H "Content-Type: application/json" \
-  -d '{"name": "Carlos Souza", "email": "carlos@email.com", "age": 22}'
+  -d '{"nome":"Carlos Souza","dataNasc":"2004-02-10","email":"carlos@email.com"}'
 ```
 
-### Atualizar completo (PUT)
+### Listar alunos
 ```bash
-curl -X PUT http://localhost:3000/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"name": "Ana Silva Atualizada", "email": "ana.nova@email.com", "age": 29}'
+curl http://localhost:3000/alunos
 ```
-
-### Atualizar parcial (PATCH)
-```bash
-curl -X PATCH http://localhost:3000/users/1 \
-  -H "Content-Type: application/json" \
-  -d '{"age": 30}'
-```
-
-### Deletar
-```bash
-curl -X DELETE http://localhost:3000/users/2
-```
-
----
-
-## 📐 Formato do usuário
-
-```json
-{
-  "id": 1,
-  "name": "Ana Silva",
-  "email": "ana@email.com",
-  "age": 28
-}
-```
-
-- `id` — gerado automaticamente, não pode ser alterado
-- `name` e `email` — obrigatórios no POST e PUT
-- `age` — opcional
-
----
-
-## ⚠️ Observações para a aula
-
-- Os dados ficam **somente na memória RAM** — reiniciar o servidor apaga tudo.
-- Não há autenticação — propositalmente simples para fins didáticos.
-- Próximos passos sugeridos: adicionar banco de dados (SQLite, MongoDB), usar
-  Express.js, adicionar validação com Zod, implementar JWT.

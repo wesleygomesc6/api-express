@@ -1,39 +1,62 @@
-import { alunos } from '../dados/db.js'
+import pool from '../dados/db.js'
 
-const listar = ((pedido, resposta) => {
+const listar = (async (pedido, resposta) => {
+    const [alunos] = await pool.execute(
+        'SELECT id, matricula, nome, dataNasc, email FROM alunos ORDER BY id'
+    )
     resposta.json(alunos)
 })
 
-const criar = ((pedido, resposta) => {
-    const aluno = {
-        id: alunos.length + 1,
-        matricula: pedido.body.matricula,
-        nome: pedido.body.nome,
-        dataNasc: pedido.body.dataNasc,
-        email: pedido.body.email
+const criar = (async (pedido, resposta) => {
+    const { nome, dataNasc, email } = pedido.body
+    const conexao = await pool.getConnection()
+
+    try {
+        await conexao.beginTransaction()
+        const [resultado] = await conexao.execute(
+            'INSERT INTO alunos (matricula, nome, dataNasc, email) VALUES (?, ?, ?, ?)',
+            ['', nome, dataNasc, email]
+        )
+        const matricula = `${new Date().getFullYear()}${resultado.insertId}`
+
+        await conexao.execute(
+            'UPDATE alunos SET matricula = ? WHERE id = ?',
+            [matricula, resultado.insertId]
+        )
+        await conexao.commit()
+
+        resposta.status(201).json({ id: resultado.insertId, matricula, nome, dataNasc, email })
+    } catch (erro) {
+        await conexao.rollback()
+        throw erro
+    } finally {
+        conexao.release()
     }
-
-    alunos.push(aluno)
-
-    resposta.json(aluno)
 })
 
-const editar = ( (pedido, resposta) => {
-    const index = alunos.findIndex(aluno => aluno.id == pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'Aluno não encontrado!'})
+const editar = (async (pedido, resposta) => {
+    const { matricula, nome, dataNasc, email } = pedido.body
+    const [resultado] = await pool.execute(
+        'UPDATE alunos SET matricula = ?, nome = ?, dataNasc = ?, email = ? WHERE id = ?',
+        [matricula, nome, dataNasc, email, pedido.params.id]
+    )
+    if (resultado.affectedRows === 0) {
+        return resposta.status(404).json({ mensagem: 'Aluno não encontrado!' })
     }
-    alunos[index] = { ...alunos[index], ...pedido.body}
-    resposta.json(alunos[index])
+
+    resposta.json({ id: Number(pedido.params.id), matricula, nome, dataNasc, email })
 })
 
-const deletar = ( (pedido, resposta) => {
-    const index = alunos.findIndex(aluno => aluno.id === pedido.params.id)
-    if(index === -1) {
-        return resposta.json({mensagem: 'Aluno não encontrado!'})
+const deletar = (async (pedido, resposta) => {
+    const [resultado] = await pool.execute(
+        'DELETE FROM alunos WHERE id = ?',
+        [pedido.params.id]
+    )
+    if (resultado.affectedRows === 0) {
+        return resposta.status(404).json({ mensagem: 'Aluno não encontrado!' })
     }
-    alunos.splice(index, 1)
-    resposta.json({mensagem: 'Aluno deletado com sucesso!'})
+
+    resposta.json({ mensagem: 'Aluno deletado com sucesso!' })
 })
 
 
